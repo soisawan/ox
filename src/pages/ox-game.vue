@@ -17,28 +17,30 @@
         </div>
       </div>
       <v-spacer />
-      <div class="d-flex align-center" style="margin-right: 10px;">
-        <v-avatar v-if="username" class="mr-2" size="35">
-          <v-img alt="User Avatar" :src="pic" />
-        </v-avatar>
-        <span v-if="username" class="white--text">{{ username }}</span>
+      <div class="profile-container d-flex align-center">
+        <div class="profile-content">
+          <v-avatar v-if="username" class="mr-2" size="35">
+            <v-img alt="User Avatar" :src="pic" />
+          </v-avatar>
+          <span v-if="username">{{ username }}</span>
+        </div>
+
+        <v-menu offset-y>
+          <template #activator="{ props }">
+            <v-btn icon v-bind="props">
+              <v-icon>mdi-chevron-down</v-icon>
+            </v-btn>
+          </template>
+
+          <v-list>
+            <v-list-item @click="logout">
+              <v-list-item-title>
+                <v-icon color="red" left>mdi-logout</v-icon> ออกจากเกม
+              </v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
       </div>
-
-      <v-menu offset-y>
-        <template #activator="{ props }">
-          <v-btn icon v-bind="props">
-            <v-icon>mdi-chevron-down</v-icon>
-          </v-btn>
-        </template>
-
-        <v-list>
-          <v-list-item @click="logout">
-            <v-list-item-title>
-              <v-icon color="red" left>mdi-logout</v-icon> ออกจากเกม
-            </v-list-item-title>
-          </v-list-item>
-        </v-list>
-      </v-menu>
     </v-app-bar>
 
     <v-main :style="{ backgroundColor: colorBg }">
@@ -410,5 +412,30 @@
   color: #333;
   text-align: center; /* จัดข้อความให้อยู่ตรงกลาง */
   flex-direction: column;
+}
+
+.profile-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: auto; /* กำหนดให้ยาวติดขอบ */
+  background-color: white; /* สีพื้นหลัง */
+  border-top-left-radius: 50px; /* มุมโค้งซ้ายบน */
+  border-bottom-left-radius: 50px; /* มุมโค้งซ้ายล่าง */
+  padding: 10px;
+}
+
+.profile-content {
+  display: flex;
+  align-items: center;
+  margin-right: auto; /* ให้กรอบอยู่ด้านซ้าย */
+}
+
+.mr-2 {
+  margin-right: 10px;
+}
+
+.white--text {
+  color: white;
 }
 </style>
