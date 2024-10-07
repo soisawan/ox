@@ -1,18 +1,32 @@
 <template>
   <v-app>
-    <v-app-bar app color="primary" dark>
-      <v-app-bar-title>Tic Tac Toe</v-app-bar-title>
-      <v-spacer /> <!-- Spacer สำหรับจัดพื้นที่ให้เล็กลง -->
-
-      <!-- Avatar และ ชื่อผู้ใช้งานพร้อม dropdown -->
+    <v-app-bar
+      app
+      class="custom-app-bar"
+      color="transparent"
+      dark
+      flat
+      height="1px"
+    >
+      <v-btn class="ml-2" variant="outlined" @click="resetGame">
+        NEW GAME
+      </v-btn>
+      <v-spacer />
+      <div class="half-circle">
+        <div class="score-container">
+          <span class="score player">{{ playerScore }}</span>
+          <span class="divider">:</span>
+          <span class="score bot">{{ botScore }}</span>
+        </div>
+      </div>
+      <v-spacer />
       <div class="d-flex align-center" style="margin-right: 10px;">
-        <v-avatar class="mr-2" size="35"> <!-- ปรับขนาดของ avatar ให้เล็กลง -->
+        <v-avatar v-if="username" class="mr-2" size="35">
           <v-img alt="User Avatar" :src="pic" />
         </v-avatar>
-        <span class="white--text">{{ username }}</span>
+        <span v-if="username" class="white--text">{{ username }}</span>
       </div>
 
-      <!-- Dropdown เมนูออกจากระบบ -->
       <v-menu offset-y>
         <template #activator="{ props }">
           <v-btn icon v-bind="props">
@@ -23,21 +37,22 @@
         <v-list>
           <v-list-item @click="logout">
             <v-list-item-title>
-              <v-icon color="red" left>mdi-logout</v-icon> ออกจากระบบ
+              <v-icon color="red" left>mdi-logout</v-icon> ออกจากเกม
             </v-list-item-title>
           </v-list-item>
         </v-list>
       </v-menu>
     </v-app-bar>
 
-    <v-main>
+    <v-main style="background-color: #a3e1fe;">
       <div class="tic-tac-toe">
         <div v-for="(cell, index) in board" :key="index" class="cell" @click="makeMove(index)">
           {{ cell }}
         </div>
       </div>
-
-      <v-btn color="primary" @click="resetGame">เริ่มเกมใหม่</v-btn>
+      <div class="high-score-container">
+        <h3>High Score: {{ highScore }}</h3>
+      </div>
     </v-main>
   </v-app>
 </template>
@@ -50,7 +65,7 @@
   import axios from 'axios'
 
   const auth0 = useAuth0()
-  const username = auth0.user.value?.name
+  const username = ref(auth0.user.value?.name || 'Guest')
   const pic = auth0.user.value?.picture
   const isAuthenticated = auth0.isAuthenticated
   const userId = auth0.user.value?.sub // Auth0 user ID
@@ -60,6 +75,11 @@
   // ตัวแปรเพื่อบอกว่าเป็นตาของใคร (X หรือ O)
   const currentPlayer = ref('X')
 
+  // Score
+  const playerScore = ref(0) // คะแนนผู้เล่น
+  const botScore = ref(0) // คะแนนบอท
+
+  const highScore = ref(100)
   // ฟังก์ชันตรวจสอบการชนะ
   const checkWinner = (board: string[]) => {
     const winningCombinations = [
@@ -213,17 +233,22 @@
     window.location.href = '/'
   }
   onMounted(() => {
-    // if (!isAuthenticated.value) {
-    //   router.push('/')
-    // }
+    if (auth0.isAuthenticated.value) {
+      username.value = auth0.user.value?.name || 'Guest'
+    } else {
+      auth0.loginWithRedirect()
+    }
   })
 </script>
 
 <style scoped>
+.custom-app-bar {
+  min-height: 110px;
+}
 .tic-tac-toe {
   display: grid;
-  grid-template-columns: repeat(3, 150px); /* เพิ่มขนาดแต่ละช่อง */
-  grid-template-rows: repeat(3, 150px);    /* เพิ่มขนาดแต่ละช่อง */
+  grid-template-columns: repeat(3, 150px);
+  grid-template-rows: repeat(3, 150px);
   gap: 10px;
   justify-content: center;
   align-items: center;
@@ -234,12 +259,12 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 3rem; /* เพิ่มขนาดตัวอักษร */
+  font-size: 3rem;
   background-color: #f0f0f0;
   border: 1px solid #ccc;
   cursor: pointer;
-  width: 150px; /* เพิ่มขนาด */
-  height: 150px; /* เพิ่มขนาด */
+  width: 150px;
+  height: 150px;
 }
 
 /* Flexbox เพื่อให้ตารางอยู่ตรงกลางหน้าจอ */
@@ -247,10 +272,52 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh; /* ทำให้ครอบคลุมหน้าจอ */
+  /* height: 100vh; */
+  flex-direction: column;
 }
 
-.v-avatar {
-  display: inline-block;
+.half-circle {
+  width: 200px;
+  height: 100px;
+  background-color: white;
+  border-bottom-left-radius: 90px;
+  border-bottom-right-radius: 90px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  /* margin-right: 10px; */
+}
+
+.score-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  width: 50%;
+}
+
+.score {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.player {
+  color: #4CAF50; /* สีของคะแนนผู้เล่น */
+}
+
+.bot {
+  color: #FF5733; /* สีของคะแนนบอท */
+}
+
+.divider {
+  font-size: 1.5rem;
+  color: black;
+}
+
+.high-score-container {
+  margin-top: 20px;
+  font-size: 1.5rem;
+  color: #333;
+  text-align: center; /* จัดข้อความให้อยู่ตรงกลาง */
 }
 </style>
