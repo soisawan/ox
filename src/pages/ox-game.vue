@@ -212,21 +212,21 @@
     Notiflix.Notify.success('ออกจากระบบเรียบร้อยแล้ว')
     window.location.href = '/'
   }
-
   onMounted(() => {
-    if (!isAuthenticated.value) {
-      router.push('/')
-    }
+    // if (!isAuthenticated.value) {
+    //   router.push('/')
+    // }
   })
 </script>
 
 <style scoped>
 .tic-tac-toe {
   display: grid;
-  grid-template-columns: repeat(3, 100px);
-  grid-template-rows: repeat(3, 100px);
+  grid-template-columns: repeat(3, 150px); /* เพิ่มขนาดแต่ละช่อง */
+  grid-template-rows: repeat(3, 150px);    /* เพิ่มขนาดแต่ละช่อง */
   gap: 10px;
   justify-content: center;
+  align-items: center;
   margin-top: 20px;
 }
 
@@ -234,12 +234,20 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 2rem;
+  font-size: 3rem; /* เพิ่มขนาดตัวอักษร */
   background-color: #f0f0f0;
   border: 1px solid #ccc;
   cursor: pointer;
-  width: 100px;
-  height: 100px;
+  width: 150px; /* เพิ่มขนาด */
+  height: 150px; /* เพิ่มขนาด */
+}
+
+/* Flexbox เพื่อให้ตารางอยู่ตรงกลางหน้าจอ */
+.v-main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* ทำให้ครอบคลุมหน้าจอ */
 }
 
 .v-avatar {
