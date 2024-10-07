@@ -8,9 +8,6 @@
       flat
       height="1px"
     >
-      <v-btn class="ml-2" variant="outlined" @click="resetGame">
-        NEW GAME
-      </v-btn>
       <v-spacer />
       <div class="half-circle">
         <div class="score-container">
@@ -50,12 +47,18 @@
                              align-items: center"
       >
         <v-col cols="6">
-          <v-img alt="avatar" height="50" :src="img" width="50" />
+          <v-img
+            alt="avatar"
+            class="center-avatar"
+            height="100"
+            :src="img"
+            width="100"
+          />
           <div class="turn-container">
-            <h3>{{ currentTurn }} TURN</h3>
+            <h3>{{ status }}</h3>
           </div>
           <div class="high-score-container">
-            <h3>High Score: {{ highScore }}</h3>
+            <h3>Total Score: {{ totalScore }}</h3>
           </div>
         </v-col>
         <v-col cols="6">
@@ -63,6 +66,11 @@
             <div v-for="(cell, index) in board" :key="index" class="cell" @click="makeMove(index)">
               {{ cell }}
             </div>
+          </div>
+          <div class="mt-4">
+            <v-btn class="ml-2" variant="outlined" @click="resetGame">
+              NEW GAME
+            </v-btn>
           </div>
         </v-col>
       </v-row>
@@ -91,28 +99,38 @@
 
   // ตัวแปรเพื่อบอกว่าเป็นตาของใคร (X หรือ O)
   const playerScore = ref(0)
+  const botScore = ref(0)
   const consecutiveWins = ref(0)
   const currentPlayer = ref('X')
   let totalScore = userStore.score
 
   const colorBg = ref('#a3e1fe')
-  const currentTurn = ref('YOUR')
+  const status = ref('YOUR TURN')
   const img = ref(playerImage)
   const updateScore = async (isWin: boolean) => {
     if (isWin) {
       consecutiveWins.value += 1
       playerScore.value += 1
-      totalScore += playerScore.value
+      totalScore += 1
+      status.value = 'YOU WIN!!'
       if (consecutiveWins.value === 3) {
         // Award bonus point after 3 consecutive wins
+        status.value = 'YOU WIN 3 CONSECUTIVE!!'
         playerScore.value += 1
-        totalScore += playerScore.value
+        totalScore += 1
         Notiflix.Notify.success('คุณได้รับคะแนนพิเศษสำหรับการชนะติดต่อกัน 3 ครั้ง!')
         consecutiveWins.value = 0 // Reset streak
       }
     } else {
-      playerScore.value -= 1
+      if (totalScore > 0) {
+        totalScore -= 1
+      }
+      if (playerScore.value > 0) {
+        playerScore.value -= 1
+      }
+      botScore.value += 1
       consecutiveWins.value = 0 // Reset streak on loss
+      status.value = 'YOU LOSE'
     }
     await updateUserScoreInAuth0(totalScore)
     Notiflix.Notify.success(`คะแนนปัจจุบันของคุณ: ${playerScore.value}`)
@@ -170,7 +188,9 @@
   // ฟังก์ชันให้ AI บอทเคลื่อนไหว
   const makeBotMove = () => {
     colorBg.value = '#a3e1fe'
-    currentTurn.value = 'YOUR'
+    status.value = 'YOUR TURN'
+    img.value = playerImage
+
     let bestScore = -Infinity
     let move = -1
     for (let i = 0; i < board.value.length; i++) {
@@ -185,7 +205,7 @@
       }
     }
     if (move !== -1) {
-      // board.value[move] = 'O'
+      board.value[move] = 'O'
       currentPlayer.value = 'X'
     }
   }
@@ -196,28 +216,31 @@
       board.value[index] = 'X'
       currentPlayer.value = 'O'
       colorBg.value = '#ffcccc'
-      currentTurn.value = 'BOT'
-
-      const winner = checkWinner(board.value)
-      if (!winner) {
-        setTimeout(() => {
-          makeBotMove() // Bot makes a move
-          const winnerAfterBot = checkWinner(board.value)
-          if (winnerAfterBot) {
-            if (winnerAfterBot === 'X') {
-              Notiflix.Notify.success('คุณชนะ!')
-              updateScore(true) // Player wins
-            } else if (winnerAfterBot === 'O') {
-              Notiflix.Notify.failure('คุณแพ้!')
-              updateScore(false) // Player loses
-            }
-          } else if (checkDraw()) {
-            Notiflix.Notify.info('เกมเสมอ!')
-          }
-        }, 1000) // หน่วงเวลาให้บอทเดิน 1 วินาที
+      status.value = 'BOT TURN'
+      img.value = botImage
+      if (checkDraw()) {
+        Notiflix.Notify.info('เกมเสมอ!')
+        status.value = 'DRAW'
       } else {
-        Notiflix.Notify.success(`${winner} ชนะ!`)
-        updateScore(winner === 'X') // Determine if player won
+        const winner = checkWinner(board.value)
+        if (!winner) {
+          setTimeout(() => {
+            makeBotMove() // Bot makes a move
+            const winnerAfterBot = checkWinner(board.value)
+            if (winnerAfterBot) {
+              if (winnerAfterBot === 'X') {
+                Notiflix.Notify.success('คุณชนะ!')
+                updateScore(true) // Player wins
+              } else if (winnerAfterBot === 'O') {
+                Notiflix.Notify.failure('คุณแพ้!')
+                updateScore(false) // Player loses
+              }
+            }
+          }, 1000) // หน่วงเวลาให้บอทเดิน 1 วินาที
+        } else {
+          Notiflix.Notify.success(`${winner} ชนะ!`)
+          updateScore(winner === 'X') // Determine if player won
+        }
       }
     }
   }
@@ -268,6 +291,9 @@
   const resetGame = () => {
     board.value = ['', '', '', '', '', '', '', '', '']
     currentPlayer.value = 'X'
+    colorBg.value = '#a3e1fe'
+    img.value = playerImage
+    status.value = 'YOUR TURN'
     Notiflix.Notify.success('เริ่มเกมใหม่เรียบร้อย')
   }
 
