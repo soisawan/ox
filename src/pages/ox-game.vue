@@ -45,9 +45,14 @@
     </v-app-bar>
 
     <v-main style="background-color: #a3e1fe;">
-      <div class="tic-tac-toe">
-        <div v-for="(cell, index) in board" :key="index" class="cell" @click="makeMove(index)">
-          {{ cell }}
+      <div class="game-layout">
+        <div class="turn-container">
+          <h3>YOUR TURN</h3>
+        </div>
+        <div class="tic-tac-toe">
+          <div v-for="(cell, index) in board" :key="index" class="cell" @click="makeMove(index)">
+            {{ cell }}
+          </div>
         </div>
       </div>
       <div class="high-score-container">
@@ -74,6 +79,8 @@
 
   // ตัวแปรเพื่อบอกว่าเป็นตาของใคร (X หรือ O)
   const currentPlayer = ref('X')
+
+  const colorBg = ref('#a3e1fe')
 
   // Score
   const playerScore = ref(0) // คะแนนผู้เล่น
@@ -245,6 +252,17 @@
 .custom-app-bar {
   min-height: 110px;
 }
+
+.game-layout {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.turn-container {
+  margin-right: 20px;
+}
+
 .tic-tac-toe {
   display: grid;
   grid-template-columns: repeat(3, 150px);
@@ -270,10 +288,9 @@
 /* Flexbox เพื่อให้ตารางอยู่ตรงกลางหน้าจอ */
 .v-main {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  /* height: 100vh; */
-  flex-direction: column;
 }
 
 .half-circle {
@@ -286,7 +303,6 @@
   justify-content: center;
   align-items: center;
   position: relative;
-  /* margin-right: 10px; */
 }
 
 .score-container {
@@ -302,7 +318,7 @@
 }
 
 .player {
-  color: #4CAF50; /* สีของคะแนนผู้เล่น */
+  color: #50c6fc; /* สีของคะแนนผู้เล่น */
 }
 
 .bot {
