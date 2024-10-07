@@ -41,10 +41,12 @@
 </template>
 
 <script lang="ts" setup>
+  import { useUserStore } from '@/stores/user'
   import { useAuth0 } from '@auth0/auth0-vue'
   import axios from 'axios'
 
   const auth0 = useAuth0()
+  const userStore = useUserStore()
   const score = ref('กำลังโหลด...')
 
   const fetchProfile = async (userId: string) => {
@@ -72,7 +74,12 @@
     if (data) {
       const userId = data.sub
       const profile = await fetchProfile(userId!)
-      score.value = profile.user_metadata ? profile.user_metadata.score : '0'
+      if (profile.user_metadata) {
+        score.value = profile.user_metadata.score
+        userStore.score = profile.user_metadata.score
+      } else {
+        score.value = '0'
+      }
     }
   })
 </script>

@@ -78,27 +78,46 @@
   import botImage from '../assets/img/bot.png'
   import playerImage from '../assets/img/player.png'
   import axios from 'axios'
+  import { useUserStore } from '@/stores/user'
 
   const auth0 = useAuth0()
-  const username = ref(auth0.user.value?.name || 'Guest')
+  const username = auth0.user.value?.name
   const pic = auth0.user.value?.picture
   const isAuthenticated = auth0.isAuthenticated
   const userId = auth0.user.value?.sub // Auth0 user ID
+  const userStore = useUserStore()
   // เก็บข้อมูลของตาราง Tic-Tac-Toe
   const board = ref(['', '', '', '', '', '', '', '', ''])
 
   // ตัวแปรเพื่อบอกว่าเป็นตาของใคร (X หรือ O)
+  const playerScore = ref(0)
+  const consecutiveWins = ref(0)
   const currentPlayer = ref('X')
+  let totalScore = userStore.score
 
   const colorBg = ref('#a3e1fe')
   const currentTurn = ref('YOUR')
   const img = ref(playerImage)
+  const updateScore = async (isWin: boolean) => {
+    if (isWin) {
+      consecutiveWins.value += 1
+      playerScore.value += 1
+      totalScore += playerScore.value
+      if (consecutiveWins.value === 3) {
+        // Award bonus point after 3 consecutive wins
+        playerScore.value += 1
+        totalScore += playerScore.value
+        Notiflix.Notify.success('คุณได้รับคะแนนพิเศษสำหรับการชนะติดต่อกัน 3 ครั้ง!')
+        consecutiveWins.value = 0 // Reset streak
+      }
+    } else {
+      playerScore.value -= 1
+      consecutiveWins.value = 0 // Reset streak on loss
+    }
+    await updateUserScoreInAuth0(totalScore)
+    Notiflix.Notify.success(`คะแนนปัจจุบันของคุณ: ${playerScore.value}`)
+  }
 
-  // Score
-  const playerScore = ref(0) // คะแนนผู้เล่น
-  const botScore = ref(0) // คะแนนบอท
-
-  const highScore = ref(100)
   // ฟังก์ชันตรวจสอบการชนะ
   const checkWinner = (board: string[]) => {
     const winningCombinations = [
@@ -166,7 +185,7 @@
       }
     }
     if (move !== -1) {
-      board.value[move] = 'O'
+      // board.value[move] = 'O'
       currentPlayer.value = 'X'
     }
   }
@@ -182,17 +201,23 @@
       const winner = checkWinner(board.value)
       if (!winner) {
         setTimeout(() => {
-          makeBotMove() // ให้บอทเดินหลังจากผู้เล่น
+          makeBotMove() // Bot makes a move
           const winnerAfterBot = checkWinner(board.value)
           if (winnerAfterBot) {
-            Notiflix.Notify.success(`${winnerAfterBot} ชนะ!`)
+            if (winnerAfterBot === 'X') {
+              Notiflix.Notify.success('คุณชนะ!')
+              updateScore(true) // Player wins
+            } else if (winnerAfterBot === 'O') {
+              Notiflix.Notify.failure('คุณแพ้!')
+              updateScore(false) // Player loses
+            }
           } else if (checkDraw()) {
             Notiflix.Notify.info('เกมเสมอ!')
-            updateUserScoreInAuth0(10)
           }
         }, 1000) // หน่วงเวลาให้บอทเดิน 1 วินาที
       } else {
         Notiflix.Notify.success(`${winner} ชนะ!`)
+        updateScore(winner === 'X') // Determine if player won
       }
     }
   }
@@ -255,16 +280,20 @@
     Notiflix.Notify.success('ออกจากระบบเรียบร้อยแล้ว')
     window.location.href = '/'
   }
+
   onMounted(() => {
-    if (auth0.isAuthenticated.value) {
-      username.value = auth0.user.value?.name || 'Guest'
-    } else {
-      auth0.loginWithRedirect()
+    if (!isAuthenticated.value) {
+      router.push('/')
     }
   })
 </script>
 
 <style scoped>
+.center-avatar {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
 .custom-app-bar {
   min-height: 110px;
 }
