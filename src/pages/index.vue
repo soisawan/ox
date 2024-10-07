@@ -19,8 +19,8 @@
               outlined
               style="border-radius: 30px;"
             >
-              <v-card-title class="text-h5">คะแนนสะสม</v-card-title>
-              <v-card-subtitle style="font-size: 20px;">{{ score }} คะแนน</v-card-subtitle>
+              <v-card-title class="text-h5 mb-n2">คะแนนสะสม</v-card-title>
+              <v-card-subtitle class="font-weight-bold" style="font-size: 20px;">{{ score }}</v-card-subtitle>
             </v-card>
 
             <v-btn v-if="!user" style="font-size: 20px;" @click="login">เข้าสู่ระบบ</v-btn>
@@ -45,7 +45,7 @@
   import axios from 'axios'
 
   const auth0 = useAuth0()
-  const score = ref('-')
+  const score = ref('กำลังโหลด...')
 
   const fetchProfile = async (userId: string) => {
     try {
@@ -72,12 +72,7 @@
     if (data) {
       const userId = data.sub
       const profile = await fetchProfile(userId!)
-      score.value = profile.user_metadata.score
+      score.value = profile.user_metadata ? profile.user_metadata.score : '0'
     }
-  })
-
-  onMounted(async () => {
-    // const profile = await fetchProfile()
-    // console.log(profile)
   })
 </script>
