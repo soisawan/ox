@@ -1,0 +1,9 @@
+{
+    "domain": "dev-4q1tggqlrj05l3o1.us.auth0.com",
+    "clientId": "tvSMfcwWj024Eu7YZat4om9RJQcQ6jzK",
+
+    "client_id": "OErPGNhyIhoU1xJSfdf1zCsorjn9JNB5",
+    "client_secret": "kFc3M7LK3gfyt93ZJqK0wultYk1AAVAC4eK1cLjLfKcqwr1wKEef6dFdwX_FiDpV",
+    "audience": "https://dev-4q1tggqlrj05l3o1.us.auth0.com/api/v2/",
+    "grant_type": "client_credentials"
+}
