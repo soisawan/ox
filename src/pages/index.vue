@@ -42,22 +42,42 @@
 
 <script lang="ts" setup>
   import { useAuth0 } from '@auth0/auth0-vue'
+  import axios from 'axios'
+
   const auth0 = useAuth0()
-  const score = ref(500)
-  const username = auth0.user.value?.name
-  const isAuthenticated = auth0.isAuthenticated.value
+  const score = ref('-')
+
+  const fetchProfile = async (userId: string) => {
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_APP_API_URL}/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${import.meta.env.VITE_APP_API_TOKEN}`,
+        },
+      })
+      return response.data
+    } catch (error) {
+      console.error('Error fetching profile:', error)
+    }
+  }
 
   const login = async () => {
-    auth0.loginWithRedirect()
-    console.log('check')
+    await auth0.loginWithRedirect()
   }
 
   const user = computed(() => {
-    console.log(auth0?.user.value)
     return auth0.user.value
   })
 
-  // onMounted(() => {
-  //   isAuthenticated.value = auth0.isAuthenticated.value
-  // })
+  watch(user, async (data, oldVal) => {
+    if (data) {
+      const userId = data.sub
+      const profile = await fetchProfile(userId!)
+      score.value = profile.user_metadata.score
+    }
+  })
+
+  onMounted(async () => {
+    // const profile = await fetchProfile()
+    // console.log(profile)
+  })
 </script>
