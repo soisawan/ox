@@ -44,20 +44,28 @@
       </v-menu>
     </v-app-bar>
 
-    <v-main style="background-color: #a3e1fe;">
-      <div class="game-layout">
-        <div class="turn-container">
-          <h3>YOUR TURN</h3>
-        </div>
-        <div class="tic-tac-toe">
-          <div v-for="(cell, index) in board" :key="index" class="cell" @click="makeMove(index)">
-            {{ cell }}
+    <v-main :style="{ backgroundColor: colorBg }">
+      <v-row
+        style=" flex-direction: row;
+                             align-items: center"
+      >
+        <v-col cols="6">
+          <v-img alt="avatar" height="50" :src="img" width="50" />
+          <div class="turn-container">
+            <h3>{{ currentTurn }} TURN</h3>
           </div>
-        </div>
-      </div>
-      <div class="high-score-container">
-        <h3>High Score: {{ highScore }}</h3>
-      </div>
+          <div class="high-score-container">
+            <h3>High Score: {{ highScore }}</h3>
+          </div>
+        </v-col>
+        <v-col cols="6">
+          <div class="tic-tac-toe">
+            <div v-for="(cell, index) in board" :key="index" class="cell" @click="makeMove(index)">
+              {{ cell }}
+            </div>
+          </div>
+        </v-col>
+      </v-row>
     </v-main>
   </v-app>
 </template>
@@ -67,6 +75,8 @@
   import Notiflix from 'notiflix'
   import { useAuth0 } from '@auth0/auth0-vue'
   import router from '@/router'
+  import botImage from '../assets/img/bot.png'
+  import playerImage from '../assets/img/player.png'
   import axios from 'axios'
 
   const auth0 = useAuth0()
@@ -81,6 +91,8 @@
   const currentPlayer = ref('X')
 
   const colorBg = ref('#a3e1fe')
+  const currentTurn = ref('YOUR')
+  const img = ref(playerImage)
 
   // Score
   const playerScore = ref(0) // คะแนนผู้เล่น
@@ -138,6 +150,8 @@
 
   // ฟังก์ชันให้ AI บอทเคลื่อนไหว
   const makeBotMove = () => {
+    colorBg.value = '#a3e1fe'
+    currentTurn.value = 'YOUR'
     let bestScore = -Infinity
     let move = -1
     for (let i = 0; i < board.value.length; i++) {
@@ -162,6 +176,8 @@
     if (!board.value[index] && currentPlayer.value === 'X') {
       board.value[index] = 'X'
       currentPlayer.value = 'O'
+      colorBg.value = '#ffcccc'
+      currentTurn.value = 'BOT'
 
       const winner = checkWinner(board.value)
       if (!winner) {
@@ -174,7 +190,7 @@
             Notiflix.Notify.info('เกมเสมอ!')
             updateUserScoreInAuth0(10)
           }
-        }, 300) // หน่วงเวลาให้บอทเดิน 1 วินาที
+        }, 1000) // หน่วงเวลาให้บอทเดิน 1 วินาที
       } else {
         Notiflix.Notify.success(`${winner} ชนะ!`)
       }
@@ -252,24 +268,13 @@
 .custom-app-bar {
   min-height: 110px;
 }
-
-.game-layout {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.turn-container {
-  margin-right: 20px;
-}
-
 .tic-tac-toe {
   display: grid;
   grid-template-columns: repeat(3, 150px);
   grid-template-rows: repeat(3, 150px);
   gap: 10px;
-  justify-content: center;
-  align-items: center;
+  /* justify-content: center;
+  align-items: center; */
   margin-top: 20px;
 }
 
@@ -288,9 +293,9 @@
 /* Flexbox เพื่อให้ตารางอยู่ตรงกลางหน้าจอ */
 .v-main {
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
+  /* height: 100vh; */
 }
 
 .half-circle {
@@ -303,6 +308,7 @@
   justify-content: center;
   align-items: center;
   position: relative;
+  /* margin-right: 10px; */
 }
 
 .score-container {
@@ -335,5 +341,13 @@
   font-size: 1.5rem;
   color: #333;
   text-align: center; /* จัดข้อความให้อยู่ตรงกลาง */
+  flex-direction: column;
+}
+.turn-container {
+  margin-top: 20px;
+  font-size: 2rem;
+  color: #333;
+  text-align: center; /* จัดข้อความให้อยู่ตรงกลาง */
+  flex-direction: column;
 }
 </style>
