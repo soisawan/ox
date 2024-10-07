@@ -94,6 +94,7 @@
   const isAuthenticated = auth0.isAuthenticated
   const userId = auth0.user.value?.sub // Auth0 user ID
   const userStore = useUserStore()
+  let isFinish = false
   // เก็บข้อมูลของตาราง Tic-Tac-Toe
   const board = ref(['', '', '', '', '', '', '', '', ''])
 
@@ -212,6 +213,7 @@
 
   // ฟังก์ชันการคลิกแต่ละช่อง
   const makeMove = (index: number) => {
+    if (isFinish) return
     if (!board.value[index] && currentPlayer.value === 'X') {
       board.value[index] = 'X'
       currentPlayer.value = 'O'
@@ -221,6 +223,7 @@
       if (checkDraw()) {
         Notiflix.Notify.info('เกมเสมอ!')
         status.value = 'DRAW'
+        isFinish = true
       } else {
         const winner = checkWinner(board.value)
         if (!winner) {
@@ -228,6 +231,7 @@
             makeBotMove() // Bot makes a move
             const winnerAfterBot = checkWinner(board.value)
             if (winnerAfterBot) {
+              isFinish = true
               if (winnerAfterBot === 'X') {
                 Notiflix.Notify.success('คุณชนะ!')
                 updateScore(true) // Player wins
@@ -238,6 +242,7 @@
             }
           }, 1000) // หน่วงเวลาให้บอทเดิน 1 วินาที
         } else {
+          isFinish = true
           Notiflix.Notify.success(`${winner} ชนะ!`)
           updateScore(winner === 'X') // Determine if player won
         }
@@ -294,6 +299,7 @@
     colorBg.value = '#a3e1fe'
     img.value = playerImage
     status.value = 'YOUR TURN'
+    isFinish = false
     Notiflix.Notify.success('เริ่มเกมใหม่เรียบร้อย')
   }
 
