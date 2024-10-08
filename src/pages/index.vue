@@ -1,38 +1,68 @@
 <template>
-  <v-app>
+  <v-app class="animated-background">
     <v-main>
       <v-container class="d-flex flex-column align-center justify-center fill-height text-center">
-        <v-card class="mx-auto" outlined style="border-radius: 30px; padding: 20px 0px" width="700">
-          <v-card-title class="text-h5">ยินดีต้อนรับเข้าสู่เกม Tic Tac Toe</v-card-title>
+        <v-card class="mx-auto elevation-3" outlined style="border-radius: 30px; padding: 30px;" width="500">
+          <v-card-title class="text-h5" style="font-size: 30px; font-weight: bold;"><h2>Welcome To Tic Tac Toe</h2></v-card-title>
 
           <v-card-text>
-            <v-avatar class="mx-auto mb-3" size="100">
+            <v-avatar v-if="user" class="mx-auto mb-3" size="120">
               <v-img alt="User Avatar" :src="user?.picture" />
             </v-avatar>
 
-            <h3 class="mb-2" style="font-size: 25px;">{{ user?.name }}</h3>
+            <h3 v-if="user" class="mb-2" style="font-size: 24px; font-weight: bold;">{{ user?.name }}</h3>
 
+            <!-- Total Score Card -->
             <v-card
               v-if="user"
-              class="mx-auto mb-4"
+              class="mx-auto mb-4 elevation-2"
               max-width="300px"
               outlined
-              style="border-radius: 30px;"
+              style="border-radius: 20px; background: linear-gradient(135deg, #3B76EF, #4A90E2); color: white; transition: all 0.3s ease;"
+              @mouseleave="hover = false"
+              @mouseover="hover = true"
             >
-              <v-card-title class="text-h5 mb-n2">คะแนนสะสม</v-card-title>
-              <v-card-subtitle class="font-weight-bold" style="font-size: 20px;">{{ score }}</v-card-subtitle>
+              <v-card-title class="text-h5 mb-n2" style="font-weight: bold; color: white;">
+                Total Score
+              </v-card-title>
+              <v-card-subtitle
+                class="font-weight-bold"
+                style="font-size: 26px; font-weight: bold; color: #FFD700; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);"
+              >
+                {{ score }}
+              </v-card-subtitle>
             </v-card>
 
-            <v-btn v-if="!user" style="font-size: 20px;" @click="login">เข้าสู่ระบบ</v-btn>
+            <!-- Welcome screen with background animation for when user is null -->
+            <div v-else class="welcome-card">
+              <img
+                alt="Welcome to Tic Tac Toe"
+                class="welcome-image"
+                src="../assets/img/logo.png"
+              >
+            </div>
+
+            <v-btn
+              v-if="!user"
+              class="rounded-pill"
+              elevation="2"
+              style="font-size: 20px; background-color: #3B76EF; color: white; width: 200px; height: 50px;"
+              @click="login"
+            >
+              Login
+            </v-btn>
+
             <v-btn
               v-else
-              class="v-btn--large"
+              class="rounded-pill"
               color="primary"
-              style="font-size: 20px;"
+              elevation="3"
+              style="font-size: 20px; background-color: #3B76EF; color: white; width: 200px; height: 50px;"
               to="/ox-game"
             >
-              เริ่มต้นเกม
+              Start
             </v-btn>
+
           </v-card-text>
         </v-card>
       </v-container>
@@ -41,6 +71,7 @@
 </template>
 
 <script lang="ts" setup>
+// Importing the logo image from assets folder
   import { useUserStore } from '@/stores/user'
   import { useAuth0 } from '@auth0/auth0-vue'
   import axios from 'axios'
@@ -48,6 +79,7 @@
   const auth0 = useAuth0()
   const userStore = useUserStore()
   const score = ref('กำลังโหลด...')
+  const hover = ref(false)
 
   const fetchProfile = async (userId: string) => {
     try {
@@ -83,3 +115,63 @@
     }
   })
 </script>
+
+<style scoped>
+/* Full-screen background color animation */
+.animated-background {
+  background: linear-gradient(135deg, #ffcccc, #a3e1fe);
+  background-size: 400% 400%;
+  animation: bgColorFade 15s ease infinite;
+}
+
+/* Keyframes for background color animation */
+@keyframes bgColorFade {
+  0% { background-color: #ffcccc; }
+  25% { background-color: #ffd9cc; }
+  50% { background-color: #a3e1fe; }
+  75% { background-color: #ffe6cc; }
+  100% { background-color: #ffcccc; }
+}
+
+/* Welcome Card Styling */
+.welcome-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  border-radius: 20px;
+}
+
+/* Image styling */
+.welcome-image {
+  max-width: 60%;
+  border-radius: 50%; /* Make it circular */
+  border: white solid 8px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Add subtle shadow */
+  animation: spin 10s linear infinite; /* Add a slow spin animation */
+}
+
+/* Animation for rotating the image */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Text styling */
+.welcome-text {
+  font-size: 28px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* Card Hover Effect */
+.v-card:hover {
+  transform: scale(1.03);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+</style>
