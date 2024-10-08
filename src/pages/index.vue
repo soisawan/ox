@@ -18,7 +18,7 @@
               class="mx-auto mb-4 elevation-2"
               max-width="300px"
               outlined
-              style="border-radius: 20px; background: linear-gradient(135deg, #3B76EF, #4A90E2); color: white; transition: all 0.3s ease;"
+              style="border-radius: 20px; background: linear-gradient(10deg, #3B76EF, #ac9cff ); color: white; transition: all 0.3s ease;"
               @mouseleave="hover = false"
               @mouseover="hover = true"
             >
@@ -27,7 +27,7 @@
               </v-card-title>
               <v-card-subtitle
                 class="font-weight-bold"
-                style="font-size: 26px; font-weight: bold; color: #FFD700; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);"
+                style="font-size: 26px; font-weight: bold; color:white ; text-shadow: 2px 20px 10px rgba(0, 0, 0, 0.5);"
               >
                 {{ score }}
               </v-card-subtitle>
@@ -54,10 +54,9 @@
 
             <v-btn
               v-else
-              class="rounded-pill"
-              color="primary"
+              class="rounded-pill rainbow rainbow-1"
               elevation="3"
-              style="font-size: 20px; background-color: #3B76EF; color: white; width: 200px; height: 50px;"
+              style="font-size: 20px; width: 200px; height: 50px;"
               to="/ox-game"
             >
               Start
@@ -117,10 +116,29 @@
 </script>
 
 <style scoped>
+.rainbow{
+  background-color: #76b8fa;
+  border-radius: 4px;
+  color: #fff;
+  cursor: pointer;
+  padding: 8px 16px;
+
+}
+
+.rainbow-1:hover{
+   background-image: linear-gradient(90deg, #00C0FF 0%, #FFCF00 49%, #FC4F4F 80%, #00C0FF 100%);
+   animation:slidebg 5s linear infinite;
+}
+
+@keyframes slidebg {
+  to {
+    background-position:20vw;
+  }
+}
+
 /* Full-screen background color animation */
 .animated-background {
   background: linear-gradient(135deg, #ffcccc, #a3e1fe);
-  background-size: 400% 400%;
   animation: bgColorFade 15s ease infinite;
 }
 
