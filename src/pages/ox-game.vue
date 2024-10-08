@@ -19,7 +19,7 @@
       <v-spacer />
       <div class="profile-container d-flex align-center">
         <div class="profile-content">
-          <v-avatar v-if="username" class="mr-2" size="35">
+          <v-avatar v-if="username" class="mr-2 ml-2" size="35">
             <v-img alt="User Avatar" :src="pic" />
           </v-avatar>
           <span v-if="username">{{ username }}</span>
@@ -43,7 +43,7 @@
       </div>
     </v-app-bar>
 
-    <v-main :style="{ backgroundColor: colorBg }">
+    <v-main :style="{ background: colorBg }">
       <v-row
         style=" flex-direction: row;
                              align-items: center"
@@ -70,7 +70,7 @@
             </div>
           </div>
           <div class="mt-4">
-            <v-btn class="ml-2" color="white" variant="flat" @click="resetGame">
+            <v-btn class="rounded-pill rainbow rainbow-1" color="white" style="font-size: 20px; width: 200px; height: 50px;" @click="resetGame">
               NEW GAME
             </v-btn>
           </div>
@@ -107,7 +107,7 @@
   const currentPlayer = ref('X')
   let totalScore = userStore.score
 
-  const colorBg = ref('#a3e1fe')
+  const colorBg = ref('linear-gradient(150deg, #6d9dff, #c4b9fd, #5d90f8 )')
   const status = ref('YOUR TURN')
   const img = ref(playerImage)
   const updateScore = async (isWin: boolean) => {
@@ -194,7 +194,7 @@
 
   // ฟังก์ชันให้ AI บอทเคลื่อนไหว
   const makeBotMove = () => {
-    colorBg.value = '#a3e1fe'
+    colorBg.value = 'linear-gradient(150deg, #6d9dff, #c4b9fd, #5d90f8 )'
     status.value = 'YOUR TURN'
     img.value = playerImage
 
@@ -223,7 +223,7 @@
     if (!board.value[index] && currentPlayer.value === 'X') {
       board.value[index] = 'X'
       currentPlayer.value = 'O'
-      colorBg.value = '#ffcccc'
+      colorBg.value = 'linear-gradient(190deg, #fea1d2, #ffcccc, #5d90f8 )'
       status.value = 'BOT TURN'
       img.value = botImage
       if (checkDraw()) {
@@ -313,7 +313,7 @@
   const resetGame = () => {
     board.value = ['', '', '', '', '', '', '', '', '']
     currentPlayer.value = 'X'
-    colorBg.value = '#a3e1fe'
+    colorBg.value = 'linear-gradient(150deg, #6d9dff, #c4b9fd, #5d90f8 )'
     img.value = playerImage
     status.value = 'YOUR TURN'
     isFinish = false

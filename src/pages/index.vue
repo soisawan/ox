@@ -44,9 +44,9 @@
 
             <v-btn
               v-if="!user"
-              class="rounded-pill"
+              class="rounded-pill rainbow rainbow-2"
               elevation="2"
-              style="font-size: 20px; background-color: #3B76EF; color: white; width: 200px; height: 50px;"
+              style="font-size: 20px; width: 200px; height: 50px;"
               @click="login"
             >
               Login
@@ -126,7 +126,12 @@
 }
 
 .rainbow-1:hover{
-   background-image: linear-gradient(90deg, #00C0FF 0%, #FFCF00 49%, #FC4F4F 80%, #00C0FF 100%);
+   background-image: linear-gradient(90deg, #70dafd 0%, #fae482 49%, #ff8989 80%, #70dafd 100%);
+   animation:slidebg 5s linear infinite;
+}
+
+.rainbow-2:hover{
+   background-image: linear-gradient(90deg, #00C0FF 0%, #ff9844 49%, #ffe986 80%, #00C0FF 100%);
    animation:slidebg 5s linear infinite;
 }
 
@@ -138,7 +143,7 @@
 
 /* Full-screen background color animation */
 .animated-background {
-  background: linear-gradient(135deg, #ffcccc, #a3e1fe);
+  background: linear-gradient(200deg,#fdeb9a , #ffcccc, #3b65b3);
   animation: bgColorFade 15s ease infinite;
 }
 
